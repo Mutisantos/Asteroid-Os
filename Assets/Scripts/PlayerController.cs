@@ -4,76 +4,89 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using MainInput;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController :SpaceObject {
 
 	public float xAxisThreshold = 0.02f;
 	public float yAxisThreshold = 0.02f;
-	public float speed;
-
-	public float rotSpeed = 20f;
-
+	public float moveSpeed;
+	public float rotSpeed;
 	public float maxSpeed;
 
+	public float warpCooldown;
+
+	public int aliveBullets = 5;
+
 	private Animator anim;
-	private Rigidbody mybody;
-	private Vector2 movement;
-
+	private Rigidbody2D mybody;
 	private Transform rotDirector;
-
+	private float timeStamp;
 	public MainInputManager mainInput;
 	public GameObject collisionFX;
 
-	//Efectos de sonido para el jugador
+	
 	public AudioClip dieSound;
 	public AudioClip dieExplosion;
-	//Control del audio de caminada del personaje
-	public float deltaStep = 1f;
-
 
 	// Use this for initialization
 	void Awake () {
-		mybody = GetComponent<Rigidbody> ();
-		anim = GetComponent<Animator> ();
+		mybody = GetComponent<Rigidbody2D> ();
+		anim = GetComponentsInChildren<Animator> ()[0];
 		rotDirector = GetComponentsInChildren<Transform>()[0];
 		collisionFX.SetActive (false);
+		timeStamp = Time.time ;
+
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
 		if (GameManager.instance.isAlive ()) {//Los no me puedo seguir moviendo si me muero
+			checkLimits();
 			move ();
+			shoot ();
 		}
 	}
 
-
+	private void shoot(){
+		if(mainInput.button_ADown && aliveBullets > 0){
+			
+		}
+	}
 
 	private void move(){
 
 		//Rotate
 		Quaternion rot = rotDirector.transform.rotation;
-		float y  = rot.eulerAngles.y;
-		y += mainInput.horizontal * rotSpeed * Time.deltaTime;
-		rotDirector.transform.rotation = Quaternion.Euler(90,y,0);
+		float z  = rot.eulerAngles.z;
+		z -= mainInput.horizontal * rotSpeed * Time.deltaTime;
+		rotDirector.transform.rotation = Quaternion.Euler(0,0,z);
 
 		//Forward
 		float l = mainInput.vertical;
-		if((l > yAxisThreshold) && mybody.velocity.magnitude < maxSpeed){
-			Vector3 faceDirection = rotDirector.transform.TransformDirection(Vector3.up);
-			mybody.AddForce( faceDirection * speed * l );
-			Debug.Log(faceDirection+"-"+speed+"-"+l);
+		if((l > yAxisThreshold)){
+			Vector2 faceDirection = rotDirector.transform.TransformDirection(Vector2.up);
+			mybody.AddForce( faceDirection * moveSpeed * l );
+			Debug.Log(faceDirection+"-"+moveSpeed+"-"+l);
+			anim.SetBool("moving",true);
 		}
-		else if (mybody.velocity.magnitude < yAxisThreshold)
-			mybody.velocity = Vector2.zero;
-		else if (l < -yAxisThreshold)
+		else if (l < yAxisThreshold)
+			anim.SetBool("moving",false);
 
+		//Warp
+		if (mainInput.downDown)
+			warpShip();
 
-		Debug.Log(mybody.velocity.magnitude+"-"+l);
 	}
 
 
 
 	private void warpShip(){
-		
+		if(timeStamp <= Time.time){
+			timeStamp = Time.time + warpCooldown;
+			float randX = Random.Range(-HorzExtent,HorzExtent);
+			float randY = Random.Range(-vertExtent,vertExtent);
+			transform.position = new Vector2(randX,randY);
+			Debug.Log(randX+"+"+randY);
+		}
 	}
 	//Trigger que determina si el jugador gana o pierde al contacto
 	private void OnTriggerEnter2D(Collider2D coll){
