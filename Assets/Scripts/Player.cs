@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using MainInput;
 
-public class PlayerController :SpaceObject {
+public class Player :SpaceObject {
 
 	public float xAxisThreshold = 0.02f;
 	public float yAxisThreshold = 0.02f;
@@ -13,9 +13,6 @@ public class PlayerController :SpaceObject {
 	public float maxSpeed;
 
 	public float warpCooldown;
-
-	public int aliveBullets = 5;
-
 	private Animator anim;
 	private Rigidbody2D mybody;
 	private Transform rotDirector;
@@ -42,13 +39,6 @@ public class PlayerController :SpaceObject {
 		if (GameManager.instance.isAlive ()) {//Los no me puedo seguir moviendo si me muero
 			checkLimits();
 			move ();
-			shoot ();
-		}
-	}
-
-	private void shoot(){
-		if(mainInput.button_ADown && aliveBullets > 0){
-			
 		}
 	}
 
@@ -60,12 +50,11 @@ public class PlayerController :SpaceObject {
 		z -= mainInput.horizontal * rotSpeed * Time.deltaTime;
 		rotDirector.transform.rotation = Quaternion.Euler(0,0,z);
 
-		//Forward
+		//Thrust
 		float l = mainInput.vertical;
 		if((l > yAxisThreshold)){
 			Vector2 faceDirection = rotDirector.transform.TransformDirection(Vector2.up);
 			mybody.AddForce( faceDirection * moveSpeed * l );
-			Debug.Log(faceDirection+"-"+moveSpeed+"-"+l);
 			anim.SetBool("moving",true);
 		}
 		else if (l < yAxisThreshold)
@@ -85,7 +74,6 @@ public class PlayerController :SpaceObject {
 			float randX = Random.Range(-HorzExtent,HorzExtent);
 			float randY = Random.Range(-vertExtent,vertExtent);
 			transform.position = new Vector2(randX,randY);
-			Debug.Log(randX+"+"+randY);
 		}
 	}
 	//Trigger que determina si el jugador gana o pierde al contacto

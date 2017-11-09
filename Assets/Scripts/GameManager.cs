@@ -8,12 +8,14 @@ public class GameManager : MonoBehaviour {
 	public static GameManager instance;
 
 	private const int START_LIVES = 3;
-	public int lives = 0;
+	public int lives = 3;
 	private int score = 0;
 	private bool ended = false;
 	private bool alive = true;
 	[SerializeField]
 	private Vector2 respawnPoint;
+
+	public int shotsLeft = 5;
 
 	void Awake() {
 		MakeSingleton ();
@@ -45,8 +47,8 @@ public class GameManager : MonoBehaviour {
 		this.score = score;
 	}
 
-	public void addScore(int avoided){
-		this.score += avoided;
+	public void addScore(int points){
+		this.score += points;
 	}
 
 
@@ -83,6 +85,13 @@ public class GameManager : MonoBehaviour {
 		this.respawnPoint = respawnPoint;
 	}
 
+	public void spendShot(){
+		shotsLeft--;
+	}
+
+	public void addShots(){
+		shotsLeft++;
+	}
 
 
 } 

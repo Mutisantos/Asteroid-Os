@@ -42,6 +42,17 @@ public class SoundManager : MonoBehaviour {
 		playerSource.Play ();
 	}
 
+	public bool isEffectPlaying(){
+		return fxSource.isPlaying;
+	}
+
+	public bool isPlayerPlaying(){
+		return playerSource.isPlaying;
+	}
+
+	public void stopPlayerSounds(){
+		playerSource.Stop();
+	}
 
 	public void RandomizePlayerFx (params AudioClip [] clips){
 		
