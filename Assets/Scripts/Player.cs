@@ -20,7 +20,7 @@ public class Player :SpaceObject {
 	public MainInputManager mainInput;
 	public GameObject collisionFX;
 
-	
+	public AudioClip warpSound;
 	public AudioClip dieSound;
 	public AudioClip dieExplosion;
 
@@ -70,6 +70,7 @@ public class Player :SpaceObject {
 
 	private void warpShip(){
 		if(timeStamp <= Time.time){
+			SoundManager.instance.PlayOnce(warpSound);
 			timeStamp = Time.time + warpCooldown;
 			float randX = Random.Range(-HorzExtent,HorzExtent);
 			float randY = Random.Range(-vertExtent,vertExtent);
