@@ -12,14 +12,15 @@ public class Player :SpaceObject {
 	public float rotSpeed;
 	public float maxSpeed;
 
+	public float respawnInmunityTime = 2f;
 	public float warpCooldown;
+
+	private float inmunityTime;
 	private Animator anim;
 	private Rigidbody2D mybody;
 	private Transform rotDirector;
 	private float timeStamp;
 	public MainInputManager mainInput;
-	public GameObject collisionFX;
-
 	public AudioClip warpSound;
 	public AudioClip dieSound;
 	public AudioClip dieExplosion;
@@ -29,13 +30,16 @@ public class Player :SpaceObject {
 		mybody = GetComponent<Rigidbody2D> ();
 		anim = GetComponentsInChildren<Animator> ()[0];
 		rotDirector = GetComponentsInChildren<Transform>()[0];
-		collisionFX.SetActive (false);
 		timeStamp = Time.time ;
+		inmunityTime = respawnInmunityTime;
 
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+		if(inmunityTime > 0){
+			inmunityTime -=Time.deltaTime;
+		}
 		if (GameManager.instance.isAlive ()) {//Los no me puedo seguir moviendo si me muero
 			checkLimits();
 			move ();
@@ -77,10 +81,9 @@ public class Player :SpaceObject {
 			transform.position = new Vector2(randX,randY);
 		}
 	}
-	//Trigger que determina si el jugador gana o pierde al contacto
 	private void OnTriggerEnter2D(Collider2D coll){
 		
-		if (coll.tag == "EnemyBody") {
+		if (coll.tag == "EnemyBody" && inmunityTime <= 0) {
 			if (GameManager.instance.getLives () == 0) {
 				anim.SetBool ("Alive", false);
 				GameManager.instance.setAlive (false);
@@ -91,27 +94,7 @@ public class Player :SpaceObject {
 			else {
 				StartCoroutine (respawnPlayer ());
 			}
-		}
-
-		if (coll.tag == "Goal") {
-			GameManager.instance.setAlive(true);
-			GameManager.instance.setEnded(true);
-			anim.SetBool ("Win", true);
-			StartCoroutine (waitForEndGame(3f));
-		}
-
-	
-	}
-
-	private void OnCollisionEnter2D(Collision2D coll){
-		if (coll.collider.tag == "Buildings") {
-			StartCoroutine (collisionEffect (true));
-		}
-	}
-
-	private void OnCollisionExit2D(Collision2D coll){
-		if (coll.collider.tag == "Buildings") {
-			StartCoroutine (collisionEffect (false));
+			GameManager.instance.addLives (- 1);
 		}
 	}
 
@@ -127,27 +110,22 @@ public class Player :SpaceObject {
 		SoundManager.instance.PlayOnce (this.dieExplosion);
 	}
 
-	IEnumerator collisionEffect(bool state){
-		collisionFX.SetActive (state);
-		yield return new WaitForSeconds (0.5f);
-	}
-
 	IEnumerator respawnPlayer(){
 		
 		anim.SetBool ("Alive", false);
+		mybody.velocity = Vector2.zero;
+		
 		SoundManager.instance.PlayPlayerOnce (this.dieSound);
 		yield return new WaitForSeconds (0.5f);
 		SoundManager.instance.PlayOnce (this.dieExplosion);
 		GameManager.instance.setAlive (false);
-		GameManager.instance.setEnded (true);
-		yield return new WaitForSeconds (0.5f);
+		yield return new WaitForSeconds (0.4f);
 		anim.SetBool ("Alive", true);
-		anim.SetFloat ("Speed", 2000f);
 		yield return new WaitForSeconds (0.05f);
-		anim.SetFloat ("Speed", 1f);
 		GameManager.instance.setAlive (true);
-		GameManager.instance.setEnded (false);
-		transform.position = (GameManager.instance.getRespawnPoint ());
 
+		transform.position = (GameManager.instance.getRespawnPoint ());
+		transform.rotation = Quaternion.identity;
+		inmunityTime = respawnInmunityTime;
 	}
 }

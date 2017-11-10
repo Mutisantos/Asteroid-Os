@@ -10,12 +10,10 @@ public class SpaceBullet : SpaceObject {
 	public float timeAlive;
 
 	public AudioClip clip;
-	private float timeStamp;
 	private Rigidbody2D bulletBody;
 
 	void Awake(){
 		bulletBody = GetComponent<Rigidbody2D> ();	
-		timeStamp = Time.deltaTime ;
 	}
 	void Start () {
 		Vector2 faceDirection = Vector2.up;
@@ -27,10 +25,17 @@ public class SpaceBullet : SpaceObject {
 		checkLimits();
 		timeAlive -= Time.deltaTime;
 		if(timeAlive <= 0){
+			GameManager.instance.clearMultiplier();
 			expire();
 		}
 	}
 
+	private void OnTriggerEnter2D(Collider2D coll){
+		if (coll.gameObject.tag == "EnemyBody") {
+			Debug.Log("Meteorito");
+			expire();
+		}
+	}
 	private void expire(){
 		GameManager.instance.addShots();
 		Destroy(gameObject);

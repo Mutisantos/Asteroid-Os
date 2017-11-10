@@ -9,9 +9,14 @@ public class GameManager : MonoBehaviour {
 
 	private const int START_LIVES = 3;
 	public int lives = 3;
+	public float multiplier = 1f;
+	public int multiplierCount = 0;
+	public int maxMultipCount = 5;
+	[SerializeField]
 	private int score = 0;
 	private bool ended = false;
 	private bool alive = true;
+	private int level = 1;
 	[SerializeField]
 	private Vector2 respawnPoint;
 
@@ -35,23 +40,37 @@ public class GameManager : MonoBehaviour {
 		return this.lives;
 	}
 
-	public void setLives(int lives){
-		this.lives = lives ;
+	public void addLives(int lives){
+		this.lives += lives ;
+		HUDController.instance.updateLives(this.lives);
 	}
 
 	public int getScore(){
 		return this.score;
 	}
 
-	public void setScore(int score){
-		this.score = score;
-	}
 
 	public void addScore(int points){
-		this.score += points;
+		this.score += (int) Mathf.Floor(points * multiplier);
+		HUDController.instance.updateScore(score);
+		addMultiplier();
 	}
 
 
+	private void addMultiplier(){
+		if(multiplierCount == maxMultipCount)
+			multiplierCount = 0;
+		else
+			multiplierCount++;
+		multiplier += 0.25f;
+		HUDController.instance.updateMultiplier((int)Mathf.Floor(multiplier));
+	}
+
+	public void clearMultiplier(){
+		multiplierCount = 0;
+		multiplier = 1;
+		HUDController.instance.updateMultiplier(1);
+	}
 
 	public bool isEnded(){
 		return this.ended;
@@ -93,5 +112,11 @@ public class GameManager : MonoBehaviour {
 		shotsLeft++;
 	}
 
+	public int getLevel(){
+		return this.level;
+	}
 
+	public void addLevel(){
+		level++;
+	}
 } 

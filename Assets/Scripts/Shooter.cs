@@ -24,6 +24,8 @@ public class Shooter : MonoBehaviour {
 
 	public float chargeThreshold = 0.5f;
 
+	public int maxShots = 5;
+
 	public float chargeShotDelay = 2f;
 	private float cooldownTimer = 0f;
 	private float chargeTime = 0f;
@@ -38,8 +40,14 @@ public class Shooter : MonoBehaviour {
 		isBadCharged = false;
 	}
 	void FixedUpdate () {
-		cooldownTimer -= Time.deltaTime;
+		if(isPlayer)
+			playerFire();
+		else
+			fire();
+	}
 
+	private void playerFire(){
+		cooldownTimer -= Time.deltaTime;
 		if(mainInput.button_ADown > chargeThreshold){
 			chargeTime += Time.deltaTime;
 			if(!SoundManager.instance.isPlayerPlaying())
@@ -47,7 +55,7 @@ public class Shooter : MonoBehaviour {
 			anim.SetBool("charging",true);
 		}
 
-		if(mainInput.button_AUp && cooldownTimer <= 0 && GameManager.instance.shotsLeft > 0){
+		else if(mainInput.button_ADown > 0 && mainInput.button_ADown < chargeThreshold && cooldownTimer <= 0 && GameManager.instance.shotsLeft > 0){
 			cooldownTimer = fireDelay;
 			anim.SetBool("charging",false);
 			fire();
@@ -59,7 +67,8 @@ public class Shooter : MonoBehaviour {
 			chargeTime = 0f;
 			isBadCharged = false;
 			isFullyCharged = false;
-			SoundManager.instance.stopPlayerSounds();
+			if(SoundManager.instance.isPlayerPlaying())
+				SoundManager.instance.stopPlayerSounds();
 		}
 
 		//Charge sound alerts

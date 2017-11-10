@@ -7,6 +7,8 @@ public class SoundManager : MonoBehaviour {
 	public AudioSource fxSource;
 	public AudioSource playerSource;
 	public AudioSource musicSource;
+
+	public AudioSource asteroidSource;
 	public static SoundManager instance = null;
 
 	public AudioClip[] bgSceneMusic;
@@ -32,6 +34,12 @@ public class SoundManager : MonoBehaviour {
 		fxSource.clip = clip;
 		fxSource.pitch = 1f;
 		fxSource.Play ();
+	}
+
+	public void PlayMeteorOnce (AudioClip clip){
+		asteroidSource.clip = clip;
+		asteroidSource.pitch = 1f;
+		asteroidSource.Play ();
 	}
 
 

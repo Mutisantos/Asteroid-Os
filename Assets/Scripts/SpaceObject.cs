@@ -5,7 +5,7 @@ using UnityEngine;
 public class SpaceObject : MonoBehaviour {
 
 	protected float vertExtent;
-	protected	float HorzExtent;
+	protected float HorzExtent;
 
 	private const float threshold = 0.2f;
 
