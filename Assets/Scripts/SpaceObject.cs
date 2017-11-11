@@ -1,11 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class SpaceObject : MonoBehaviour {
-
-	protected float vertExtent;
-	protected float HorzExtent;
+public abstract class SpaceObject : MonoBehaviour {
 
 	private const float threshold = 0.2f;
 
@@ -15,8 +10,8 @@ public class SpaceObject : MonoBehaviour {
 	
 	protected void checkLimits(){
 		//Camera viewport could be resized
-        vertExtent = Camera.main.orthographicSize;
-		HorzExtent = (vertExtent * Screen.width / Screen.height);
+        float vertExtent = BoundaryChecker.instance.VertExtent;
+		float HorzExtent = BoundaryChecker.instance.HorzExtent;
 		Vector2 newPosition = transform.position;
 		if(transform.position.x > HorzExtent + threshold)//Right->Left
 			newPosition.x = -HorzExtent;

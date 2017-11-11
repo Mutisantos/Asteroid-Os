@@ -87,4 +87,8 @@ public class SoundManager : MonoBehaviour {
 		musicSource.clip = bgSceneMusic [index];
 		musicSource.Play ();
 	}
+
+	public void stopMusic(){
+		musicSource.Stop ();
+	}
 }

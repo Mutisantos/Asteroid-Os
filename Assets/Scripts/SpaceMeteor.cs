@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SpaceMeteor : SpaceObject {
 
@@ -9,7 +7,7 @@ public class SpaceMeteor : SpaceObject {
 
 	public int points;
 
-	public int multiplier;
+	public int fragments;
 	
 	public SpaceMeteor[] smallerMeteors;
 
@@ -34,7 +32,7 @@ public class SpaceMeteor : SpaceObject {
 			SpaceBullet bullet = coll.gameObject.GetComponent<SpaceBullet>();
 			SpaceMeteor newMeteor;
 			if(bullet.power > 1 && this.size > 2){
-				for(int i = 1; i < multiplier * 2; i++){
+				for(int i = 1; i < fragments * 2; i++){
 					newMeteor = Instantiate(smallerMeteors[1], transform.position, Quaternion.identity);
 					newMeteor.transform.SetParent(this.transform.parent);
 				}
@@ -42,7 +40,7 @@ public class SpaceMeteor : SpaceObject {
 				newMeteor.transform.SetParent(this.transform.parent);
 			}
 			else if (bullet.power == 1){
-				for(int i = 0; i < multiplier; i++){
+				for(int i = 0; i < fragments; i++){
 					newMeteor = Instantiate(smallerMeteors[0], transform.position, Quaternion.identity);
 					newMeteor.transform.SetParent(this.transform.parent);
 				}				

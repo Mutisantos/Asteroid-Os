@@ -1,36 +1,23 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
+/** Singleton Handler for HUD elements */
 public class HUDController : MonoBehaviour {
 
-	public static HUDController instance;	
 	public Text scoreText;
 	public Text livesText;
 	public Text multiplierText;
 	public Slider multiplierBar;
 	public Image multiplierFill;
 
+	public GameObject gameOverContainer;
 
-	// Use this for initialization
-	void Awake() {
-		MakeSingleton ();
-	}
 
 	void Start(){
 		multiplierBar.maxValue = GameManager.instance.maxMultipCount;
-	}
-	private void MakeSingleton() {
-		if (instance != null) {
-			Destroy (gameObject);
-		} else {
-			instance = this;
-			DontDestroyOnLoad (gameObject);
-		}
+		GameManager.instance.assignHUDController(this);
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		updateBar();
 	}
@@ -61,6 +48,10 @@ public class HUDController : MonoBehaviour {
 
 	public void updateMultiplier(int multiplier){
 		multiplierText.text = "x"+multiplier;
+	}
+
+	public void setGameOverVisible(bool show){
+		gameOverContainer.SetActive(show);
 	}
 
 }

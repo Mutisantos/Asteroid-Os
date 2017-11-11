@@ -32,7 +32,10 @@ public class Player :SpaceObject {
 		rotDirector = GetComponentsInChildren<Transform>()[0];
 		timeStamp = Time.time ;
 		inmunityTime = respawnInmunityTime;
+	}
 
+	void Start(){
+		GameManager.instance.assignPlayer(this);
 	}
 	
 	// Update is called once per frame
@@ -47,13 +50,11 @@ public class Player :SpaceObject {
 	}
 
 	private void move(){
-
 		//Rotate
 		Quaternion rot = rotDirector.transform.rotation;
 		float z  = rot.eulerAngles.z;
 		z -= mainInput.horizontal * rotSpeed * Time.deltaTime;
 		rotDirector.transform.rotation = Quaternion.Euler(0,0,z);
-
 		//Thrust
 		float l = mainInput.vertical;
 		if((l > yAxisThreshold)){
@@ -63,11 +64,9 @@ public class Player :SpaceObject {
 		}
 		else if (l < yAxisThreshold)
 			anim.SetBool("moving",false);
-
 		//Warp
 		if (mainInput.downDown)
 			warpShip();
-
 	}
 
 
@@ -76,45 +75,42 @@ public class Player :SpaceObject {
 		if(timeStamp <= Time.time){
 			SoundManager.instance.PlayOnce(warpSound);
 			timeStamp = Time.time + warpCooldown;
+			float vertExtent = BoundaryChecker.instance.VertExtent;
+			float HorzExtent = BoundaryChecker.instance.HorzExtent;
 			float randX = Random.Range(-HorzExtent,HorzExtent);
 			float randY = Random.Range(-vertExtent,vertExtent);
 			transform.position = new Vector2(randX,randY);
 		}
 	}
-	private void OnTriggerEnter2D(Collider2D coll){
-		
+	private void OnTriggerEnter2D(Collider2D coll){	
 		if (coll.tag == "EnemyBody" && inmunityTime <= 0) {
 			if (GameManager.instance.getLives () == 0) {
 				anim.SetBool ("Alive", false);
 				GameManager.instance.setAlive (false);
-				GameManager.instance.setEnded (true);
 				StartCoroutine (dyingEffects ());
 				StartCoroutine (waitForEndGame (3f));
 			}
 			else {
+				GameManager.instance.addLives (-1);
 				StartCoroutine (respawnPlayer ());
 			}
-			GameManager.instance.addLives (- 1);
 		}
 	}
 
-	IEnumerator waitForEndGame(float seconds){
+	private IEnumerator waitForEndGame(float seconds){
 		yield return new WaitForSeconds (seconds);
-		SoundManager.instance.changeMusic (3);
-		SceneManager.LoadSceneAsync("03Fin");
+		GameManager.instance.endGame();
 	}
 
-	IEnumerator dyingEffects(){
+	private IEnumerator dyingEffects(){
 		SoundManager.instance.PlayPlayerOnce (this.dieSound);
 		yield return new WaitForSeconds (0.5f);
 		SoundManager.instance.PlayOnce (this.dieExplosion);
 	}
 
-	IEnumerator respawnPlayer(){
-		
+	public IEnumerator respawnPlayer(){		
 		anim.SetBool ("Alive", false);
 		mybody.velocity = Vector2.zero;
-		
 		SoundManager.instance.PlayPlayerOnce (this.dieSound);
 		yield return new WaitForSeconds (0.5f);
 		SoundManager.instance.PlayOnce (this.dieExplosion);
@@ -123,7 +119,6 @@ public class Player :SpaceObject {
 		anim.SetBool ("Alive", true);
 		yield return new WaitForSeconds (0.05f);
 		GameManager.instance.setAlive (true);
-
 		transform.position = (GameManager.instance.getRespawnPoint ());
 		transform.rotation = Quaternion.identity;
 		inmunityTime = respawnInmunityTime;

@@ -6,24 +6,27 @@ using System.Collections;
 public class GameManager : MonoBehaviour {
 
 	public static GameManager instance;
+	private HUDController hudController;
 
-	private const int START_LIVES = 3;
-	public int lives = 3;
+	private MeteorController meteorController;
+
+	private Player player;
+	public int MAX_LIVES = 3;
+	private int lives = 0;
 	public float multiplier = 1f;
 	public int multiplierCount = 0;
 	public int maxMultipCount = 5;
 	[SerializeField]
 	private int score = 0;
-	private bool ended = false;
 	private bool alive = true;
 	private int level = 1;
-	[SerializeField]
 	private Vector2 respawnPoint;
 
 	public int shotsLeft = 5;
 
 	void Awake() {
 		MakeSingleton ();
+		lives = MAX_LIVES;
 	}
 
 	private void MakeSingleton() {
@@ -35,24 +38,39 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	public void assignPlayer(Player player){	
+		this.player = player;
+	}
+	public void assignMeteorController(MeteorController meteorController){	
+		this.meteorController = meteorController;
+	}
+
+	public void assignHUDController(HUDController hudController){
+		this.hudController = hudController;
+		this.hudController.updateLives(this.lives);
+		this.hudController.updateScore(this.score);		
+	}
 
 	public int getLives(){
-		return this.lives;
+		return lives;
 	}
 
 	public void addLives(int lives){
 		this.lives += lives ;
-		HUDController.instance.updateLives(this.lives);
+		hudController.updateLives(this.lives);
+		if(lives < 0){ //Dying resets the multiplier
+			clearMultiplier();
+		}
 	}
 
 	public int getScore(){
-		return this.score;
+		return score;
 	}
 
 
 	public void addScore(int points){
-		this.score += (int) Mathf.Floor(points * multiplier);
-		HUDController.instance.updateScore(score);
+		score += (int) Mathf.Floor(points * multiplier);
+		hudController.updateScore(score);
 		addMultiplier();
 	}
 
@@ -63,21 +81,13 @@ public class GameManager : MonoBehaviour {
 		else
 			multiplierCount++;
 		multiplier += 0.25f;
-		HUDController.instance.updateMultiplier((int)Mathf.Floor(multiplier));
+		hudController.updateMultiplier((int)Mathf.Floor(multiplier));
 	}
 
 	public void clearMultiplier(){
 		multiplierCount = 0;
 		multiplier = 1;
-		HUDController.instance.updateMultiplier(1);
-	}
-
-	public bool isEnded(){
-		return this.ended;
-	}
-
-	public void setEnded(bool ended){
-		this.ended = ended;
+		hudController.updateMultiplier(1);
 	}
 
 	public bool isAlive(){
@@ -87,14 +97,6 @@ public class GameManager : MonoBehaviour {
 	public void setAlive(bool alive){
 		this.alive = alive;
 	}
-
-	public void resetValues(){
-		this.ended = false; 
-		this.score = 0; 
-		this.lives = START_LIVES; 
-		this.alive = true;
-	}
-
 
 	public Vector2 getRespawnPoint(){
 		return this.respawnPoint;
@@ -119,4 +121,46 @@ public class GameManager : MonoBehaviour {
 	public void addLevel(){
 		level++;
 	}
+
+	public void endGame(){
+		Time.timeScale = 0;
+		hudController.setGameOverVisible(true);
+		SoundManager.instance.stopMusic ();
+	}
+
+	public void restartGame(){
+		resetValues();
+		this.level = -1;
+		clearMeteors();
+		resetScene();
+	}
+
+	public void continueGame(){//Keep playing from the current level
+		resetValues();
+		resetScene();
+	}
+
+	public void resetValues(){
+		Time.timeScale = 1;				
+		score = 0; 
+		lives = MAX_LIVES; 
+		alive = true;
+		SoundManager.instance.changeMusic (0);
+	}
+
+	private void resetScene(){
+		clearMultiplier();
+		player.StopAllCoroutines();
+		player.StartCoroutine (player.respawnPlayer ());
+		hudController.updateLives(this.lives);
+		hudController.updateScore(this.score);
+		hudController.setGameOverVisible(false);
+	}
+
+	private void clearMeteors(){
+		 foreach (Transform child in meteorController.transform) {
+     		GameObject.Destroy(child.gameObject);
+ 		}
+	}
+
 } 

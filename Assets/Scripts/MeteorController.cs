@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MeteorController : SpaceObject {
 
 	public SpaceMeteor biggestMeteor;
-	public Transform player;
+	private Transform player;
 
 	public AudioClip newMeteorsClip;
 	private bool generateNewMeteors = true;
@@ -15,7 +13,8 @@ public class MeteorController : SpaceObject {
 
 	}
 	void Start(){
-		
+		GameManager.instance.assignMeteorController(this);
+		player = GameObject.FindGameObjectWithTag("Player").transform;
 	}
 	void Update(){
 		checkLimits();
@@ -33,6 +32,8 @@ public class MeteorController : SpaceObject {
 	}
 
 	private void generateMeteor(int amount){
+	    float vertExtent = BoundaryChecker.instance.VertExtent;
+		float HorzExtent = BoundaryChecker.instance.HorzExtent;
 		Vector3 randPos = new Vector3(Random.Range(-HorzExtent,HorzExtent), 
 									  Random.Range(-vertExtent,vertExtent),
 									  0);	

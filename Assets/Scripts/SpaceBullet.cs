@@ -24,7 +24,7 @@ public class SpaceBullet : SpaceObject {
 	void FixedUpdate () {
 		checkLimits();
 		timeAlive -= Time.deltaTime;
-		if(timeAlive <= 0){
+		if(timeAlive <= 0 || !GameManager.instance.isAlive()){
 			GameManager.instance.clearMultiplier();
 			expire();
 		}
