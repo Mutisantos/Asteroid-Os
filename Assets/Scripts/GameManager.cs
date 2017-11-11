@@ -12,9 +12,12 @@ public class GameManager : MonoBehaviour {
 
 	private Player player;
 	public int MAX_LIVES = 3;
+
 	private int lives = 0;
 	public float multiplier = 1f;
 	public int multiplierCount = 0;
+
+	public AudioClip extraLifeClip;
 	public int maxMultipCount = 5;
 	[SerializeField]
 	private int score = 0;
@@ -22,11 +25,14 @@ public class GameManager : MonoBehaviour {
 	private int level = 1;
 	private Vector2 respawnPoint;
 
+	private float scoreForLifeCounter;
+
 	public int shotsLeft = 5;
 
 	void Awake() {
 		MakeSingleton ();
 		lives = MAX_LIVES;
+		scoreForLifeCounter = 4f;
 	}
 
 	private void MakeSingleton() {
@@ -72,6 +78,11 @@ public class GameManager : MonoBehaviour {
 		score += (int) Mathf.Floor(points * multiplier);
 		hudController.updateScore(score);
 		addMultiplier();
+		if(score > Mathf.Pow(10f,scoreForLifeCounter)){//Add a life every power of 10 > 1000
+			addLives(1);
+			scoreForLifeCounter++;
+			SoundManager.instance.PlayPlayerOnce(extraLifeClip);
+		}
 	}
 
 
