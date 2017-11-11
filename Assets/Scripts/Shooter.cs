@@ -18,8 +18,6 @@ public class Shooter : MonoBehaviour {
 	private Transform rotDirector;
 
 	private Animator anim;
-
-	public bool isPlayer; 
 	public float fireDelay = 0.3f;
 
 	public float chargeThreshold = 0.5f;
@@ -40,10 +38,7 @@ public class Shooter : MonoBehaviour {
 		isBadCharged = false;
 	}
 	void FixedUpdate () {
-		if(isPlayer)
-			playerFire();
-		else
-			fire();
+		playerFire();
 	}
 
 	private void playerFire(){

@@ -6,7 +6,7 @@ public class SpaceBullet : SpaceObject {
 
 	public int power; 
 	public int speed;
-
+	public bool isEnemyBullet;
 	public float timeAlive;
 
 	public AudioClip clip;
@@ -31,13 +31,16 @@ public class SpaceBullet : SpaceObject {
 	}
 
 	private void OnTriggerEnter2D(Collider2D coll){
-		if (coll.gameObject.tag == "EnemyBody") {
-			Debug.Log("Meteorito");
+		if (coll.gameObject.tag == "EnemyBody" && !isEnemyBullet) {
+			expire();
+		}
+		else if (coll.gameObject.tag == "Player" && isEnemyBullet) {
 			expire();
 		}
 	}
 	private void expire(){
-		GameManager.instance.addShots();
+		if(!isEnemyBullet)
+			GameManager.instance.addShots();
 		Destroy(gameObject);
 	}
 }

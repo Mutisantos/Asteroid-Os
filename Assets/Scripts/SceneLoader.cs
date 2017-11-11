@@ -15,8 +15,7 @@ public class SceneLoader : MonoBehaviour {
 
 	public void myOwnLoadScene(int index){
 		SceneManager.LoadScene (index);
-		if(index > 0)
-			GameManager.instance.resetValues();
+		GameManager.instance.resetValues();
 	}
 
 

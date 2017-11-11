@@ -9,6 +9,8 @@ public class SoundManager : MonoBehaviour {
 	public AudioSource musicSource;
 
 	public AudioSource asteroidSource;
+
+	public AudioSource UFOSource;
 	public static SoundManager instance = null;
 
 	public AudioClip[] bgSceneMusic;

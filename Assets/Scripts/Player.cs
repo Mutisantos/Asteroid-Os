@@ -42,6 +42,10 @@ public class Player :SpaceObject {
 	void FixedUpdate () {
 		if(inmunityTime > 0){
 			inmunityTime -=Time.deltaTime;
+			anim.SetBool("inmune",true);
+		}
+		else{
+			anim.SetBool("inmune",false);
 		}
 		if (GameManager.instance.isAlive ()) {//Los no me puedo seguir moviendo si me muero
 			checkLimits();
@@ -83,10 +87,8 @@ public class Player :SpaceObject {
 		}
 	}
 	private void OnTriggerEnter2D(Collider2D coll){	
-		if (coll.tag == "EnemyBody" && inmunityTime <= 0) {
+		if (coll.tag == "EnemyBody" && inmunityTime <= 0 && GameManager.instance.isAlive()) {
 			if (GameManager.instance.getLives () == 0) {
-				anim.SetBool ("Alive", false);
-				GameManager.instance.setAlive (false);
 				StartCoroutine (dyingEffects ());
 				StartCoroutine (waitForEndGame (3f));
 			}
@@ -98,26 +100,27 @@ public class Player :SpaceObject {
 	}
 
 	private IEnumerator waitForEndGame(float seconds){
+		anim.SetBool ("alive", false);
+		GameManager.instance.setAlive (false);
 		yield return new WaitForSeconds (seconds);
 		GameManager.instance.endGame();
 	}
 
 	private IEnumerator dyingEffects(){
 		SoundManager.instance.PlayPlayerOnce (this.dieSound);
-		yield return new WaitForSeconds (0.5f);
+		yield return new WaitForSeconds (1f);
 		SoundManager.instance.PlayOnce (this.dieExplosion);
 	}
 
 	public IEnumerator respawnPlayer(){		
-		anim.SetBool ("Alive", false);
+		anim.SetBool ("alive", false);
 		mybody.velocity = Vector2.zero;
 		SoundManager.instance.PlayPlayerOnce (this.dieSound);
-		yield return new WaitForSeconds (0.5f);
 		SoundManager.instance.PlayOnce (this.dieExplosion);
+		yield return new WaitForSeconds (0.1f);
 		GameManager.instance.setAlive (false);
-		yield return new WaitForSeconds (0.4f);
-		anim.SetBool ("Alive", true);
-		yield return new WaitForSeconds (0.05f);
+		yield return new WaitForSeconds (0.5f);
+		anim.SetBool ("alive", true);
 		GameManager.instance.setAlive (true);
 		transform.position = (GameManager.instance.getRespawnPoint ());
 		transform.rotation = Quaternion.identity;

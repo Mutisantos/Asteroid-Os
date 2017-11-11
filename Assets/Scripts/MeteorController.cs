@@ -34,16 +34,14 @@ public class MeteorController : SpaceObject {
 	private void generateMeteor(int amount){
 	    float vertExtent = BoundaryChecker.instance.VertExtent;
 		float HorzExtent = BoundaryChecker.instance.HorzExtent;
-		Vector3 randPos = new Vector3(Random.Range(-HorzExtent,HorzExtent), 
-									  Random.Range(-vertExtent,vertExtent),
-									  0);	
+		Vector3 randPos = new Vector3();	
 		for(int i = 0; i<amount;i++){
-			Debug.Log(randPos);
-			while (!isPositionSafe(randPos)){
+
+			do{
 			    randPos = new Vector3(Random.Range(-HorzExtent,HorzExtent), 
 									  Random.Range(-vertExtent,vertExtent),
 									  0);	
-			}
+			}while (!isPositionSafe(randPos));
 			SpaceMeteor meteor = Instantiate(biggestMeteor,randPos,Quaternion.identity);
 			meteor.transform.SetParent(this.transform);
 		}

@@ -145,7 +145,7 @@ public class GameManager : MonoBehaviour {
 		score = 0; 
 		lives = MAX_LIVES; 
 		alive = true;
-		SoundManager.instance.changeMusic (0);
+		SoundManager.instance.changeMusic(0);
 	}
 
 	private void resetScene(){
