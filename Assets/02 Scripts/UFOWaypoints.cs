@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+/** Script to represent a Beginning and Ending position for the UFO
+ * Required for the movePosition() method in UFO.cs
+ * Esteban.Hernandez
+ */
 public class UFOWaypoints : MonoBehaviour {
 
 	private Transform beginWaypoint;

@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 
-/** Checker for game boundaries that could change or resize */
+/** Singleton that check for game boundaries that could change or resize 
+ * Esteban.Hernandez
+ */
 public class BoundaryChecker : MonoBehaviour {
 
 	public static BoundaryChecker instance;

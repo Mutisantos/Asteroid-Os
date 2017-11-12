@@ -1,21 +1,21 @@
 ﻿using UnityEngine;
 
+/**Script for handling the Enemy UFO creation in game 
+ * Esteban.Hernandez
+ */
 public class UFOController : MonoBehaviour {
 	
 	public GameObject[] ufoPrefabs;
+	private UFOWaypoints[] waypoints;
 	public float minUfoRespawnTime;
 	public float maxUfoRespawnTime;
-
 	public int firstLevelforUFOs=2;
-	private UFOWaypoints[] waypoints;
 	private float respawnTimer;
-
 
 	void Start () {
 		respawnTimer = maxUfoRespawnTime;
 		waypoints = GameObject.FindGameObjectWithTag("WaypointContainer").GetComponentsInChildren<UFOWaypoints>();
-	}
-	
+	}	
 	void Update () {
 		if(GameManager.instance.getLevel() >= firstLevelforUFOs && noUFOSLeft()){
 			respawnTimer -= Time.deltaTime;
@@ -30,7 +30,6 @@ public class UFOController : MonoBehaviour {
 			}
 		}		
 	}
-
 	private bool noUFOSLeft(){
 		return transform.childCount == 0;
 	}

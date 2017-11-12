@@ -1,18 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/** Script that makes transitions from one scene to another
+ * Esteban.Hernandez
+ */
 public class SceneLoader : MonoBehaviour {
-
-	private GameObject loadingBar;
-	private GameObject contMenu;
 
 	void Start(){
 
 	}
-
 	public void myOwnLoadScene(int index){
 		SceneManager.LoadScene (index);
 		GameManager.instance.resetValues();
@@ -32,5 +29,4 @@ public class SceneLoader : MonoBehaviour {
 	public void FinishGame(){
 		Application.Quit ();
 	}
-
 }

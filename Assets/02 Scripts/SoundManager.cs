@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/**Singleton for handling sound effects and music through the game 
+ * Esteban.Hernandez
+ */
 public class SoundManager : MonoBehaviour {
 
 	public AudioSource fxSource;
@@ -10,7 +13,6 @@ public class SoundManager : MonoBehaviour {
 
 	public AudioSource asteroidSource;
 
-	public AudioSource UFOSource;
 	public static SoundManager instance = null;
 
 	public AudioClip[] bgSceneMusic;
@@ -46,9 +48,8 @@ public class SoundManager : MonoBehaviour {
 
 
 	public void PlayPlayerOnce (AudioClip clip){
-		playerSource.volume = 1f;
+		playerSource.Stop ();
 		playerSource.clip = clip;
-		playerSource.pitch = 1f;
 		playerSource.Play ();
 	}
 

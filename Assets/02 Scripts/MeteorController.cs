@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
 
+/**Script for handling the meteor/asteroid creation in game 
+ * Esteban.Hernandez
+ */
 public class MeteorController : SpaceObject {
-
+	//Biggest meteor to start every level
 	public SpaceMeteor biggestMeteor;
 	private Transform player;
 
 	public AudioClip newMeteorsClip;
 	private bool generateNewMeteors = true;
+	//Distance from the player where the meteors must be created
 	public float safeDistance = 2f;
 
 	void Awake () {
@@ -30,7 +34,8 @@ public class MeteorController : SpaceObject {
 			GameManager.instance.addLevel();
 		}
 	}
-
+	
+	// Creates new meteors. Every new level the amount increases by 1
 	private void generateMeteor(int amount){
 	    float vertExtent = BoundaryChecker.instance.VertExtent;
 		float HorzExtent = BoundaryChecker.instance.HorzExtent;
@@ -47,12 +52,19 @@ public class MeteorController : SpaceObject {
 		}
 	}
 
+	//Checks if the position of the meteor is too close or not from the player position	
 	private bool isPositionSafe(Vector3 meteorPosition){
 		return Vector3.Distance(meteorPosition,player.position) > safeDistance;
 	}
 
 	private bool noMeteorsLeft(){
 		return transform.childCount == 0;
+	}
+	
+	public void clearMeteors(){
+		 foreach (Transform child in transform) {
+     		GameObject.Destroy(child.gameObject);
+ 		}
 	}
 
 }

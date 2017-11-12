@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
+/** Script for handling inputs. Supports both standalone and mobile inputs
+ * Esteban.Hernandez
+ */
 namespace MainInput{
 	public class MainInputManager : MonoBehaviour {
 
@@ -56,6 +60,7 @@ namespace MainInput{
 			button_ShooterDown = ispressed;
 	}
 
+	/** Standalone keyboard handle */
 	void standaloneUpdate(){
 		horizontal = Input.GetAxisRaw ("Horizontal");
 		vertical = Input.GetAxisRaw ("Vertical");
@@ -64,6 +69,7 @@ namespace MainInput{
 		downDown = Input.GetButtonDown ("Down_Btn");
 	}
 
+	/** Mobile touch handle */
 	void mobileUpdate(){
 		if(button_UpDown){
 			if(vertical < 1)
@@ -106,11 +112,8 @@ namespace MainInput{
 	}
 	void Update () {
 		#if UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_WEBGL 
-
 		standaloneUpdate();
-
-		#elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE || UNITY_EDITOR
-	
+		#elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE || UNITY_EDITOR	
 		mobileUpdate();	
 		#endif
 		}

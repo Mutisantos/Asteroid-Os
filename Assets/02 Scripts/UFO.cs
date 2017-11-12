@@ -2,29 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/** Script that describes the behaviour of an Enemy UFO
+ * Esteban.Hernandez
+ */
 public class UFO : SpaceObject {
 
 	public SpaceBullet[] prefabBullets;
-	public float speed;
-
-	public int points;
-
-	public float minCooldown;
-	public float maxCooldown;
-
-	public AudioClip deadClip;
-	
+	public AudioClip deadClip;	
 	private Animator animator;
 	private Rigidbody2D ufobody;
-
 	private Transform ufoDirection;
-	private float cooldownTimer;
-	[SerializeField]
 	private Vector2 beginPosition;
-	[SerializeField]
 	private Vector2 endPosition;
 
+	public float speed;
+	public int points;
+	public float minCooldown;
+	public float maxCooldown;
 	private bool alive;
+	private float cooldownTimer;
 	
 	void Start () {
 		ufobody = GetComponent<Rigidbody2D> ();
@@ -33,7 +29,6 @@ public class UFO : SpaceObject {
 		alive = true;
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		if(alive){
 			fire();
@@ -53,14 +48,17 @@ public class UFO : SpaceObject {
 		}
 	}
 
+	//Randomize the fire rate of the UFO, making the shots randomly
 	private void randomizeCooldown(){
 		cooldownTimer = Random.Range(minCooldown,maxCooldown);
 	}
 
+	//Sets the beginning and ending position of the UFO
 	public void setWaypointPositions(Vector2 begin, Vector2 end){
 		beginPosition = begin;
 		endPosition = end;
 	}
+	//Moves the UFO towards the ending position
 	public void movePosition ()	{
 		Vector2 actualPosition = ufobody.position;
 		if (Vector2.Distance (actualPosition, endPosition) > 0.01) {

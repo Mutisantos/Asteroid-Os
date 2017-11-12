@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/**Script for animating background with a tiled-like texture 
+* Esteban.Hernandez
+*/
 public class AnimarTextura : MonoBehaviour {
 
 	public Renderer rend;
@@ -14,13 +17,12 @@ public class AnimarTextura : MonoBehaviour {
 
 	}
 				
-
 	void Update() 
 	{
-		uvOffset += ( uvAnimationRate * Time.deltaTime );//Mover el offset con respecto al tiempo
+		uvOffset += ( uvAnimationRate * Time.deltaTime );//Move the texture offset while time advances
 		if( rend.enabled )
 		{
-			rend.material.SetTextureOffset(textureName,uvOffset);//Cambiar el offset para simular el movimiento de la animacion
+			rend.material.SetTextureOffset(textureName,uvOffset);//Change texture's offset every frame to simulate movement
 		}
 	}
 }

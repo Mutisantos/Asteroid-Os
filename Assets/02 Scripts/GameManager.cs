@@ -2,37 +2,36 @@
 using System.Collections;
 
 
-//Singleton para GameManager
+/** Singleton for controlling lives, score, score multipliers
+* player status (alive/dead), shots able to make
+* and updating the HUD 
+* Esteban.Hernandez
+*/
 public class GameManager : MonoBehaviour {
 
 	public static GameManager instance;
+	public AudioClip extraLifeClip;
 	private HUDController hudController;
 
 	private MeteorController meteorController;
-
 	private Player player;
-	public int MAX_LIVES = 3;
-
+	public int maxLives = 3;
 	private int lives = 0;
+	public int shotsLeft = 5;
 	public float multiplier = 1f;
-	public int multiplierCount = 0;
-
-	public AudioClip extraLifeClip;
+	private int multiplierCount = 0;
 	public int maxMultipCount = 5;
 	[SerializeField]
 	private int score = 0;
 	private bool alive = true;
 	private int level = 1;
 	private Vector2 respawnPoint;
-
 	private float scoreForLifeCounter;
-
-	public int shotsLeft = 5;
-
 	void Awake() {
 		MakeSingleton ();
-		lives = MAX_LIVES;
+		lives = maxLives;
 		scoreForLifeCounter = 4f;
+		multiplierCount = 0;
 	}
 
 	private void MakeSingleton() {
@@ -72,29 +71,29 @@ public class GameManager : MonoBehaviour {
 	public int getScore(){
 		return score;
 	}
-
-
+	//Increase or decrease score by points
 	public void addScore(int points){
 		score += (int) Mathf.Floor(points * multiplier);
 		hudController.updateScore(score);
-		addMultiplier();
+		if(points > 0)
+			addMultiplier();
 		if(score > Mathf.Pow(10f,scoreForLifeCounter)){//Add a life every power of 10 > 1000
 			addLives(1);
 			scoreForLifeCounter++;
-			SoundManager.instance.PlayPlayerOnce(extraLifeClip);
+			SoundManager.instance.PlayOnce(extraLifeClip);
 		}
 	}
 
-
+	// Increases the multiplier every succesful shot 
 	private void addMultiplier(){
-		if(multiplierCount == maxMultipCount)
+		multiplierCount++;
+		if(multiplierCount > maxMultipCount)
 			multiplierCount = 0;
-		else
-			multiplierCount++;
 		multiplier += 0.25f;
 		hudController.updateMultiplier((int)Mathf.Floor(multiplier));
 	}
 
+	// Resets the multiplier when the player dies or a shot misses
 	public void clearMultiplier(){
 		multiplierCount = 0;
 		multiplier = 1;
@@ -117,6 +116,9 @@ public class GameManager : MonoBehaviour {
 		this.respawnPoint = respawnPoint;
 	}
 
+	public int getMultiplierCount(){
+		return multiplierCount;
+	}
 	public void spendShot(){
 		shotsLeft--;
 	}
@@ -139,6 +141,7 @@ public class GameManager : MonoBehaviour {
 		SoundManager.instance.stopMusic ();
 	}
 
+	//Restarts the game from the first level
 	public void restartGame(){
 		resetValues();
 		this.level = -1;
@@ -146,19 +149,22 @@ public class GameManager : MonoBehaviour {
 		resetScene();
 	}
 
-	public void continueGame(){//Keep playing from the current level
+	//Keeps playing from the current level
+	public void continueGame(){
 		resetValues();
 		resetScene();
 	}
-
+	//Restarts game values 
 	public void resetValues(){
 		Time.timeScale = 1;				
 		score = 0; 
-		lives = MAX_LIVES; 
+		lives = maxLives; 
 		alive = true;
 		SoundManager.instance.changeMusic(0);
+		multiplierCount = 0;
+		multiplier = 1;
 	}
-
+	
 	private void resetScene(){
 		clearMultiplier();
 		player.StopAllCoroutines();
@@ -168,10 +174,9 @@ public class GameManager : MonoBehaviour {
 		hudController.setHiddenPanelVisible(false);
 	}
 
+	//Destroys all the meteors present in the scene
 	private void clearMeteors(){
-		 foreach (Transform child in meteorController.transform) {
-     		GameObject.Destroy(child.gameObject);
- 		}
+		meteorController.clearMeteors();
 	}
 
 } 

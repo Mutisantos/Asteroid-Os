@@ -3,32 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using MainInput;
 
-/**Script for generating shoots */
+/**Script that enables the player to shoot
+ * Esteban.Hernandez
+ */
 public class Shooter : MonoBehaviour {
 
 	public MainInputManager mainInput;
 	public SpaceBullet weakShot;
 	public SpaceBullet chargedShot;
-
 	public AudioClip chargeSound;
 	public AudioClip fullCharge;
 	public AudioClip badCharge;
-	
-
 	private Transform rotDirector;
-
 	private Animator anim;
 	public float fireDelay = 0.3f;
-
+	//How much the Shoot Button axis must increase to know if it is a charged shot
 	public float chargeThreshold = 0.5f;
-
-	public int maxShots = 5;
-
+	//How much time is needed to make a charged shot
 	public float chargeShotDelay = 2f;
+	//Shot Cooldown
 	private float cooldownTimer = 0f;
+	//Charge timer
 	private float chargeTime = 0f;
-
+	//Checks if the chargeTime is enough for the charged shot
 	private bool isFullyCharged;
+	//Checks if the chargeTime is to much for the charged shot
 	private bool isBadCharged;
 	
 	void Awake () {
@@ -43,13 +42,14 @@ public class Shooter : MonoBehaviour {
 
 	private void playerFire(){
 		cooldownTimer -= Time.deltaTime;
+		//Charge Shot
 		if(mainInput.button_ADown > chargeThreshold){
 			chargeTime += Time.deltaTime;
 			if(!SoundManager.instance.isPlayerPlaying())
 				SoundManager.instance.PlayPlayerOnce(chargeSound);
 			anim.SetBool("charging",true);
 		}
-
+		//Simple shot
 		else if(mainInput.button_ADown > 0 && mainInput.button_ADown < chargeThreshold && cooldownTimer <= 0 && GameManager.instance.shotsLeft > 0){
 			cooldownTimer = fireDelay;
 			anim.SetBool("charging",false);
@@ -75,14 +75,13 @@ public class Shooter : MonoBehaviour {
 			SoundManager.instance.PlayOnce(fullCharge);
 			isFullyCharged = true;
 		}	
-
+		//Return axis value to 0 if the shot button is released
 		if(mainInput.button_AUp){
 			mainInput.button_ADown = 0;
 		}
 	}
 
 	private void fire(){
-
 		Quaternion rot = rotDirector.transform.rotation;
 		float z  = rot.eulerAngles.z;
 		Quaternion shootDirection = Quaternion.Euler(0,0,z);
@@ -96,7 +95,7 @@ public class Shooter : MonoBehaviour {
 			Instantiate(chargedShot,transform.position,shootDirection);
 			GameManager.instance.spendShot();
 		}
-		//Weak Shot
+		//Simple Shot
 		else{
 			Instantiate(weakShot,transform.position,shootDirection);
 			GameManager.instance.spendShot();

@@ -4,30 +4,29 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using MainInput;
 
+/**Script for Player movement actions and death conditions
+* Esteban.Hernandez
+*/
 public class Player :SpaceObject {
+
+	public MainInputManager mainInput;
+	public AudioClip warpSound;
+	public AudioClip dieSound;
+	public AudioClip dieExplosion;	
+	private Animator anim;
+	private Rigidbody2D mybody;
+	private Transform rotDirector;
 
 	public float xAxisThreshold = 0.02f;
 	public float yAxisThreshold = 0.02f;
 	public float moveSpeed;
 	public float rotSpeed;
 	public float maxSpeed;
-
 	public float respawnInmunityTime = 2f;
 	public float warpCooldown;
-
 	private float inmunityTime;
-	private Animator anim;
-	private Rigidbody2D mybody;
-	private Transform rotDirector;
 	private float timeStamp;
-	public MainInputManager mainInput;
-	public AudioClip warpSound;
-	public AudioClip dieSound;
-	public AudioClip dieExplosion;
 
-	private Vector2 previousDirection;//in order to apply forces when the speed limit is surpassed 
-
-	// Use this for initialization
 	void Awake () {
 		mybody = GetComponent<Rigidbody2D> ();
 		anim = GetComponentsInChildren<Animator> ()[0];
@@ -38,10 +37,8 @@ public class Player :SpaceObject {
 
 	void Start(){
 		GameManager.instance.assignPlayer(this);
-		previousDirection = Vector2.zero;
 	}
 	
-	// Update is called once per frame
 	void FixedUpdate () {
 		if(inmunityTime > 0){
 			inmunityTime -=Time.deltaTime;
@@ -50,7 +47,7 @@ public class Player :SpaceObject {
 		else{
 			anim.SetBool("inmune",false);
 		}
-		if (GameManager.instance.isAlive ()) {//Los no me puedo seguir moviendo si me muero
+		if (GameManager.instance.isAlive ()) {//Keep moving unless the player is dead
 			checkLimits();
 			move ();
 		}
@@ -66,14 +63,10 @@ public class Player :SpaceObject {
 		float l = mainInput.vertical;
 		if(l > yAxisThreshold){
 			Vector2 faceDirection = rotDirector.transform.TransformDirection(Vector2.up);
-			Debug.Log(mybody.velocity.magnitude);
-			if(!previousDirection.Equals(faceDirection) || mybody.velocity.magnitude < maxSpeed){
+			if(mybody.velocity.magnitude < maxSpeed){
 				mybody.AddForce( faceDirection * moveSpeed * l );
 				anim.SetBool("moving",true);
 			}
-
-			previousDirection = faceDirection;
-			
 		}
 		else if (l < yAxisThreshold)
 			anim.SetBool("moving",false);
@@ -81,8 +74,6 @@ public class Player :SpaceObject {
 		if (mainInput.downDown)
 			warpShip();
 	}
-
-
 
 	private void warpShip(){
 		if(timeStamp <= Time.time){
@@ -99,7 +90,7 @@ public class Player :SpaceObject {
 		if (coll.tag == "EnemyBody" && inmunityTime <= 0 && GameManager.instance.isAlive()) {
 			if (GameManager.instance.getLives () == 0) {
 				StartCoroutine (dyingEffects ());
-				StartCoroutine (waitForEndGame (3f));
+				StartCoroutine (waitForEndGame (2f));
 			}
 			else {
 				GameManager.instance.addLives (-1);
@@ -116,15 +107,17 @@ public class Player :SpaceObject {
 	}
 
 	private IEnumerator dyingEffects(){
-		SoundManager.instance.PlayPlayerOnce (this.dieSound);
-		yield return new WaitForSeconds (1f);
+		SoundManager.instance.PlayOnce (this.dieSound);
+		yield return new WaitForSeconds (0.5f);
 		SoundManager.instance.PlayOnce (this.dieExplosion);
 	}
 
-	public IEnumerator respawnPlayer(){		
+	public IEnumerator respawnPlayer(){	
+		GameManager.instance.setAlive (false);	
 		anim.SetBool ("alive", false);
 		mybody.velocity = Vector2.zero;
-		SoundManager.instance.PlayPlayerOnce (this.dieSound);
+		SoundManager.instance.PlayOnce (this.dieSound);
+		yield return new WaitForSeconds (0.75f);
 		SoundManager.instance.PlayOnce (this.dieExplosion);
 		yield return new WaitForSeconds (0.1f);
 		GameManager.instance.setAlive (false);
