@@ -25,9 +25,11 @@ public class SpaceBullet : SpaceObject {
 	void FixedUpdate () {
 		checkLimits();
 		timeAlive -= Time.deltaTime;
-		if((timeAlive <= 0 && !isEnemyBullet)|| !GameManager.instance.isAlive()){
-			GameManager.instance.clearMultiplier();
-			GameManager.instance.addScore(-1);//Decrease score if the shot failed or th
+		if(timeAlive <= 0 || !GameManager.instance.isAlive()){
+			if(!isEnemyBullet){
+				GameManager.instance.clearMultiplier();
+				GameManager.instance.addScore(-1);//Decrease score if the shot failed or the player is dead
+			}
 			expire();
 		}
 	}
